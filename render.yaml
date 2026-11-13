@@ -1,0 +1,54 @@
+services:
+  # === BACKEND API ===
+  - type: web
+    name: gold-covering-api
+    runtime: node
+    region: singapore
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node src/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGODB_URI
+        sync: false
+      - key: CLIENT_URL
+        sync: false
+      - key: ADMIN_URL
+        sync: false
+
+  # === USER STOREFRONT ===
+  - type: web
+    name: gold-covering-client
+    runtime: static
+    region: singapore
+    rootDir: client
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    pullRequestPreviewsEnabled: false
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # === ADMIN PORTAL ===
+  - type: web
+    name: gold-covering-admin
+    runtime: static
+    region: singapore
+    rootDir: admin
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    pullRequestPreviewsEnabled: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

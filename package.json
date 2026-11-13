@@ -1,0 +1,13 @@
+{
+  "name": "gold-covering-shop-platform",
+  "version": "1.0.0",
+  "description": "Production-Ready Full-Stack Gold Covering Chain Shop with Virtual Try-On, 3D WebGL Viewer, Admin Portal, and WhatsApp Checkout",
+  "scripts": {
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "admin": "cd admin && npm run dev",
+    "install:all": "cd server && npm install && cd ../client && npm install && cd ../admin && npm install",
+    "build:all": "cd client && npm run build && cd ../admin && npm run build"
+  }
+}
+
