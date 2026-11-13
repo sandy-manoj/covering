@@ -26,18 +26,18 @@ const seedRunner = async () => {
 
     // 3. Settings
     await Settings.create({
-      shopName: 'Chidambaram Sri Thanga Covering',
-      tagline: '1 Gram Pure Micro Gold Plated Chains & Bridal Rental Jewellery',
-      whatsappNumber: '919876543210',
-      contactPhone: '+91 98765 43210',
-      contactEmail: 'order@chidambaramcovering.com',
+      shopName: 'சிங்கப்பூர் பேன்சி & கவரிங் (Singapore Fancy & Covering)',
+      tagline: '1-கிராம் மைக்ரோ கோல்டு கவரிங் & முகூர்த்த வாடகை ஆபரணங்கள்',
+      whatsappNumber: '9884893477',
+      contactPhone: '9884893477',
+      contactEmail: 'singaporefancy@gmail.com',
       address: {
-        street: '144/2, Car Street, Near Natarajar Temple',
-        city: 'Chidambaram',
+        street: '49-வது பஜார் வீதி, I.O.B வங்கிக்கு எதிரில்',
+        city: 'வந்தவாசி (Vandavasi)',
         state: 'Tamil Nadu',
-        pincode: '608001'
+        pincode: '604408'
       },
-      shippingNotice: '✨ Special Festival Offer: Flat 20% OFF on Traditional Chains | Free Shipping above ₹999'
+      shippingNotice: '✨ தீபாவளி சிறப்பு சலுகை: 5% முதல் 20% வரை தள்ளுபடி! Stainless Steel பரிசு இலவசம்! | தொடர்புக்கு: 9884893477'
     });
 
     // 4. Banners

@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Phone, Mail, Clock, ShieldCheck, RefreshCw, Truck } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, ShieldCheck, RefreshCw, Gift } from 'lucide-react';
 import { getSettings } from '../../services/api';
+import { useLanguageStore, translations } from '../../store/useLanguageStore';
 
 const Footer = () => {
   const [settings, setSettings] = useState(null);
+  const { lang } = useLanguageStore();
+  const t = translations[lang] || translations.en;
 
   useEffect(() => {
     getSettings().then((res) => {
@@ -12,38 +15,41 @@ const Footer = () => {
     }).catch(console.error);
   }, []);
 
+  const phone = settings?.contactPhone || '9884893477';
+  const address = settings?.address?.street || '49-வது பஜார் வீதி, I.O.B வங்கிக்கு எதிரில், வந்தவாசி';
+
   return (
-    <footer className="bg-stone-900 text-stone-300 pt-16 pb-12 border-t-4 border-amber-600">
+    <footer className="bg-stone-950 text-stone-300 pt-16 pb-12 border-t-4 border-amber-600">
       {/* 3 Pillars / Trust Badges */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 border-b border-stone-800">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center sm:text-left">
-          <div className="flex items-center gap-4 bg-stone-800/60 p-4 rounded-xl border border-stone-700/50">
-            <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 shrink-0">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center sm:text-left">
+          <div className="flex items-center gap-4 bg-stone-900/80 p-4 rounded-2xl border border-stone-800">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 shrink-0">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-semibold text-white text-sm">1-Year Micro Polish Guarantee</h4>
-              <p className="text-xs text-stone-400 mt-0.5">Pure 24K gold color retention with micro plating technology</p>
+              <h4 className="font-bold text-white text-sm font-serif">{t.pillar1Title}</h4>
+              <p className="text-xs text-stone-400 mt-0.5">{t.pillar1Desc}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-4 bg-stone-800/60 p-4 rounded-xl border border-stone-700/50">
-            <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 shrink-0">
-              <Truck className="w-6 h-6" />
+          <div className="flex items-center gap-4 bg-stone-900/80 p-4 rounded-2xl border border-stone-800">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 shrink-0">
+              <Gift className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-semibold text-white text-sm">Safe & Fast Express Delivery</h4>
-              <p className="text-xs text-stone-400 mt-0.5">Trackable dispatch all across Tamil Nadu and India</p>
+              <h4 className="font-bold text-white text-sm font-serif">{t.pillar2Title}</h4>
+              <p className="text-xs text-stone-400 mt-0.5">{t.pillar2Desc}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-4 bg-stone-800/60 p-4 rounded-xl border border-stone-700/50">
-            <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 shrink-0">
+          <div className="flex items-center gap-4 bg-stone-900/80 p-4 rounded-2xl border border-stone-800">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 shrink-0">
               <RefreshCw className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-semibold text-white text-sm">100% Refundable Rental Deposit</h4>
-              <p className="text-xs text-stone-400 mt-0.5">Convenient bridal rental return policy with instant UPI refunds</p>
+              <h4 className="font-bold text-white text-sm font-serif">{t.pillar3Title}</h4>
+              <p className="text-xs text-stone-400 mt-0.5">{t.pillar3Desc}</p>
             </div>
           </div>
         </div>
@@ -56,65 +62,74 @@ const Footer = () => {
           {/* Shop Information */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <span className="text-amber-500 text-2xl">⚜️</span>
-              <span className="font-serif text-xl font-bold text-white tracking-wide">CHIDAMBARAM</span>
+              <span className="text-amber-500 text-2xl">👑</span>
+              <span className="font-serif text-lg font-black text-white tracking-wide">
+                {lang === 'ta' ? 'சிங்கப்பூர் பேன்சி & கவரிங்' : 'SINGAPORE FANCY & COVERING'}
+              </span>
             </div>
             <p className="text-xs text-stone-400 leading-relaxed">
-              {settings?.tagline || 'Pioneers in traditional 1-Gram gold covering jewellery, bridal rental harams, and handcrafted temple chains with authentic gold sheen.'}
+              {lang === 'ta' 
+                ? 'வந்தவாசி மற்றும் சுற்றுவட்டாரப் பகுதிகளில் 1-கிராம் மைக்ரோ தங்க முலாம் செயின்கள், முகூர்த்த நகைகள் வாடகை மற்றும் சிறந்த தரமான கவரிங் ஆபரணங்கள் கிடைக்கும் நம்பகமான கடை.'
+                : 'Pioneers in traditional 1-Gram gold covering jewellery, bridal rental harams, and handcrafted temple chains in Vandavasi.'}
             </p>
-            <div className="pt-2">
+            <div className="pt-1">
               <span className="inline-block text-[11px] bg-amber-950/80 text-amber-400 border border-amber-800/60 px-3 py-1 rounded-full font-medium">
-                Established Chidambaram Craftsmanship
+                {lang === 'ta' ? 'வந்தவாசியின் நம்பகமான கடை' : 'Trusted Store in Vandavasi'}
               </span>
             </div>
           </div>
 
           {/* Quick Categories */}
           <div>
-            <h4 className="text-sm font-semibold text-white tracking-wider uppercase mb-4 font-serif">Popular Chains</h4>
+            <h4 className="text-sm font-bold text-white tracking-wider uppercase mb-4 font-serif">
+              {lang === 'ta' ? 'பிரபலமான செயின்கள்' : 'Popular Collections'}
+            </h4>
             <ul className="space-y-2.5 text-xs text-stone-400">
-              <li><Link to="/shop?category=Mugappu+Chains" className="hover:text-amber-400 transition-colors">Peacock & Floral Mugappu Chains</Link></li>
-              <li><Link to="/shop?category=Rope+%26+Box+Chains" className="hover:text-amber-400 transition-colors">Daily Wear Thick Rope Chains</Link></li>
-              <li><Link to="/rent" className="hover:text-amber-400 transition-colors">Grand Bridal Rental Harams</Link></li>
-              <li><Link to="/shop?category=Traditional+Chains" className="hover:text-amber-400 transition-colors">Kerala Palakka & Temple Chains</Link></li>
-              <li><Link to="/shop?category=Customized+Name+Chains" className="hover:text-amber-400 transition-colors">Custom Name Letter Chains</Link></li>
+              <li><Link to="/shop?category=Mugappu+Chains" className="hover:text-amber-400 transition-colors">{lang === 'ta' ? 'மயில் & மாங்காய் முகப்பு செயின்கள்' : 'Peacock & Floral Mugappu Chains'}</Link></li>
+              <li><Link to="/shop?category=Rope+%26+Box+Chains" className="hover:text-amber-400 transition-colors">{lang === 'ta' ? 'ரோப் மற்றும் பாக்ஸ் தினசரி செயின்கள்' : 'Daily Wear Rope & Box Chains'}</Link></li>
+              <li><Link to="/rent" className="hover:text-amber-400 transition-colors text-amber-300 font-semibold">{lang === 'ta' ? 'பிரம்மாண்ட திருமண வாடகை ஆரங்கள்' : 'Grand Bridal Rental Harams'}</Link></li>
+              <li><Link to="/shop?category=Traditional+Chains" className="hover:text-amber-400 transition-colors">{lang === 'ta' ? 'பாரம்பரிய கோவில் ஆபரணங்கள்' : 'Traditional Temple Chains'}</Link></li>
+              <li><Link to="/shop?category=Customized+Name+Chains" className="hover:text-amber-400 transition-colors">{lang === 'ta' ? 'பெயர் பொறித்த தங்க செயின்கள்' : 'Custom Name Letter Chains'}</Link></li>
             </ul>
           </div>
 
           {/* Customer Service & Policies */}
           <div>
-            <h4 className="text-sm font-semibold text-white tracking-wider uppercase mb-4 font-serif">Customer Care</h4>
+            <h4 className="text-sm font-bold text-white tracking-wider uppercase mb-4 font-serif">
+              {lang === 'ta' ? 'வாடிக்கையாளர் சேவை' : 'Customer Care'}
+            </h4>
             <ul className="space-y-2.5 text-xs text-stone-400">
-              <li><Link to="/about" className="hover:text-amber-400 transition-colors">About Our Gold Covering</Link></li>
-              <li><Link to="/contact" className="hover:text-amber-400 transition-colors">Store Directions & Map</Link></li>
-              <li><Link to="/rent" className="hover:text-amber-400 transition-colors">How Bridal Rental Works</Link></li>
-              <li><span className="text-stone-400">Jewellery Care & Cleaning Tips</span></li>
-              <li><span className="text-stone-400">WhatsApp Ordering Guide</span></li>
+              <li><Link to="/about" className="hover:text-amber-400 transition-colors">{t.about}</Link></li>
+              <li><Link to="/contact" className="hover:text-amber-400 transition-colors">{t.contact}</Link></li>
+              <li><Link to="/rent" className="hover:text-amber-400 transition-colors">{lang === 'ta' ? 'வாடகை எடுக்கும் முறை' : 'How Bridal Rental Works'}</Link></li>
+              <li><span className="text-stone-400">{lang === 'ta' ? 'பாலிஷ் பராமரிப்பு முறைகள்' : 'Jewellery Care Tips'}</span></li>
+              <li><span className="text-stone-400">{lang === 'ta' ? 'வாட்ஸ்அப் ஆர்டர் வழிகாட்டி' : 'WhatsApp Order Guide'}</span></li>
             </ul>
           </div>
 
-          {/* Contact Details & Address */}
+          {/* Contact Details & Address (From Photo 2) */}
           <div>
-            <h4 className="text-sm font-semibold text-white tracking-wider uppercase mb-4 font-serif">Visit Our Store</h4>
+            <h4 className="text-sm font-bold text-white tracking-wider uppercase mb-4 font-serif">{t.visitStore}</h4>
             <div className="space-y-3 text-xs text-stone-400">
               <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                 <span>
-                  {settings?.address?.street || '144/2, Car Street, Near Natarajar Temple'}<br />
-                  {settings?.address?.city || 'Chidambaram'}, {settings?.address?.state || 'Tamil Nadu'} - {settings?.address?.pincode || '608001'}
+                  <strong>49-வது பஜார் வீதி</strong><br />
+                  I.O.B வங்கிக்கு எதிரில்,<br />
+                  வந்தவாசி - 604 408.
                 </span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-amber-500 shrink-0" />
-                <span>{settings?.contactPhone || '+91 98765 43210'}</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-amber-500 shrink-0" />
-                <span>{settings?.contactEmail || 'order@chidambaramcovering.com'}</span>
+                <span>
+                  <a href={`tel:${phone}`} className="hover:text-amber-400 font-semibold text-white">
+                    {phone}
+                  </a>
+                </span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Clock className="w-4 h-4 text-amber-500 shrink-0" />
-                <span>Mon - Sun: 9:30 AM - 9:00 PM</span>
+                <span>{t.monSun}</span>
               </div>
             </div>
           </div>
@@ -122,13 +137,12 @@ const Footer = () => {
       </div>
 
       {/* Copyright Bar */}
-      <div className="border-t border-stone-800 pt-6 text-center text-[11px] text-stone-500">
-        <p>© {new Date().getFullYear()} {settings?.shopName || 'Chidambaram Sri Thanga Covering'}. All rights reserved.</p>
-        <p className="mt-1">Crafted for authentic South Indian gold jewellery lovers.</p>
+      <div className="border-t border-stone-800/80 pt-6 text-center text-[11px] text-stone-500">
+        <p>© {new Date().getFullYear()} சிங்கப்பூர் பேன்சி & கவரிங் (Singapore Fancy & Covering, Vandavasi). {t.allRightsReserved}</p>
+        <p className="mt-1">அசல் 24K தங்க நிறம் கொண்ட 1-கிராம் மைக்ரோ கவரிங் நகைகள் மற்றும் திருமண வாடகை சேவைகள்.</p>
       </div>
     </footer>
   );
 };
 
 export default Footer;
-
