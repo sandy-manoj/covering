@@ -53,20 +53,22 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Single Page Application (SPA) fallback to index.html
-if (fs.existsSync(clientDistPath)) {
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(clientDistPath, 'index.html'));
+// Single Page Application (SPA) fallback (Express 5 syntax: '{*path}' or middleware fallback)
+app.use((req, res, next) => {
+  if (req.method === 'GET' && !req.path.startsWith('/api') && fs.existsSync(clientDistPath)) {
+    return res.sendFile(path.join(clientDistPath, 'index.html'));
+  }
+  next();
+});
+
+// Root fallback if client build not ready
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Singapore Fancy API is Live!',
+    health: '/api/health',
+    products: '/api/products'
   });
-} else {
-  app.get('/', (req, res) => {
-    res.json({
-      message: 'Singapore Fancy API is Live! Client app is building...',
-      health: '/api/health',
-      products: '/api/products'
-    });
-  });
-}
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
