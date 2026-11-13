@@ -1,6 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
 @layer base {
   :root {
     --gold-primary: #D4AF37;
@@ -48,12 +60,7 @@
 }
 
 .gold-text-gradient {
-  background: linear-gradient(135deg, #AA7C11 0%, #D4AF37 50%, #8C650A 100%);
+  background: linear-gradient(135deg, #FFE082 0%, #D4AF37 50%, #B8860B 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
-/* Thin scrollbar for chain carousel */
-.scrollbar-thin::-webkit-scrollbar { height: 4px; }
-.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
-.scrollbar-thin::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 2px; }

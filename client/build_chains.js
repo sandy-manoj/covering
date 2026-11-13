@@ -22,3 +22,4 @@ for (const style of styles) {
   fs.writeFileSync(path.join('public/chains', 'chain_' + style + '.svg'), svg);
 }
 console.log('Successfully generated 10 chain SVGs in public/chains');
+

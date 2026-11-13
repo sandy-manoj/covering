@@ -54,3 +54,4 @@ styles.forEach((style) => {
   fs.writeFileSync(path.join('client/public/chains', `chain_${style}.svg`), svg);
 });
 console.log('Successfully generated all 10 chain overlay SVGs in client/public/chains');
+

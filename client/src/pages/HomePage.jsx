@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, ArrowRight, ShieldCheck, Award, Flame, Calendar, ChevronRight, Gift, Percent } from 'lucide-react';
+import { Sparkles, ArrowRight, ShieldCheck, Calendar, ChevronRight, Gift, Percent } from 'lucide-react';
 import { getProducts, getBanners, getCategories, getSettings } from '../services/api';
 import ProductCard from '../components/common/ProductCard';
 import Product3DViewerModal from '../components/viewer3d/Product3DViewerModal';
@@ -8,28 +8,21 @@ import VirtualTryOnModal from '../components/tryon/VirtualTryOnModal';
 import { useLanguageStore, translations } from '../store/useLanguageStore';
 
 const HomePage = () => {
-  const [banners, setBanners] = useState([]);
   const [categories, setCategories] = useState([]);
   const [featuredChains, setFeaturedChains] = useState([]);
   const [offerChains, setOfferChains] = useState([]);
-  const [rentalChains, setRentalChains] = useState([]);
   const [allChains, setAllChains] = useState([]);
   const [settings, setSettings] = useState(null);
 
   const { lang } = useLanguageStore();
   const t = translations[lang] || translations.en;
 
-  // Modals state
   const [selectedTryOnProduct, setSelectedTryOnProduct] = useState(null);
   const [selected3DProduct, setSelected3DProduct] = useState(null);
 
   useEffect(() => {
     getSettings().then((res) => {
       if (res.data?.data) setSettings(res.data.data);
-    }).catch(console.error);
-
-    getBanners().then((res) => {
-      if (res.data?.data) setBanners(res.data.data);
     }).catch(console.error);
 
     getCategories().then((res) => {
@@ -41,29 +34,28 @@ const HomePage = () => {
       setAllChains(prods);
       setFeaturedChains(prods.filter((p) => p.isFeatured).slice(0, 4));
       setOfferChains(prods.filter((p) => p.hasOffer).slice(0, 4));
-      setRentalChains(prods.filter((p) => p.type === 'Rent' || p.type === 'Both').slice(0, 4));
     }).catch(console.error);
   }, []);
 
   return (
-    <div className="space-y-16 pb-20">
+    <div className="w-full space-y-16 pb-20 overflow-x-clip">
       
-      {/* Hero Banner Section with Real Shop Poster */}
-      <section className="relative bg-gradient-to-br from-stone-950 via-amber-950/40 to-stone-950 text-white overflow-hidden py-12 lg:py-20 border-b border-amber-900/40">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:20px_20px]" />
+      {/* 1. Hero Banner Section (Clean 2-Column Responsive Layout) */}
+      <section className="w-full relative bg-gradient-to-br from-stone-950 via-amber-950/40 to-stone-950 text-white overflow-hidden py-10 sm:py-16 border-b border-amber-900/40">
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             
-            {/* Left Column: Shop Details & CTAs */}
-            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+            {/* Left Column: Text & CTAs (No negative offsets, clean left alignment) */}
+            <div className="space-y-5 text-center lg:text-left min-w-0">
               
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold tracking-wide uppercase">
-                <Sparkles className="w-4 h-4 text-amber-400" />
-                <span>{t.heroBadge}</span>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold tracking-wide uppercase max-w-full">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span className="truncate">{t.heroBadge}</span>
               </div>
 
-              <h1 className="text-3xl sm:text-5xl lg:text-5xl font-serif font-black tracking-tight text-white leading-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-serif font-black tracking-tight text-white leading-tight break-words">
                 {t.heroTitle} <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500">
                   {t.heroTitleAccent}
@@ -74,14 +66,20 @@ const HomePage = () => {
                 {t.heroDesc}
               </p>
 
-              {/* Special Poster Highlight Banner */}
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-red-950/80 via-stone-900 to-amber-950/80 border border-red-800/40 shadow-xl space-y-2 text-left">
-                <div className="flex items-center gap-2 text-amber-400 font-serif font-bold text-sm">
-                  <Gift className="w-5 h-5 text-amber-400 shrink-0 animate-bounce" />
-                  <span>{lang === 'ta' ? 'தீபாவளி சிறப்பு சலுகை & பரிசு!' : 'Deepavali Special Discount & Free Gift!'}</span>
-                  <span className="ml-auto bg-red-600 text-white text-[11px] px-2 py-0.5 rounded-full font-sans font-bold">5% - 20% OFF</span>
+              {/* Festive Offer Card (Relative parent, strictly contained) */}
+              <div className="w-full p-4 rounded-2xl bg-gradient-to-r from-red-950/90 via-stone-900 to-amber-950/90 border border-red-800/40 shadow-xl space-y-2 text-left relative overflow-hidden">
+                <div className="flex items-center justify-between gap-2 text-amber-400 font-serif font-bold text-xs sm:text-sm">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Gift className="w-4 h-4 text-amber-400 shrink-0 animate-bounce" />
+                    <span className="truncate">
+                      {lang === 'ta' ? 'தீபாவளி சிறப்பு சலுகை & பரிசு!' : 'Deepavali Special Discount & Free Gift!'}
+                    </span>
+                  </div>
+                  <span className="bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-sans font-bold shrink-0">
+                    5% - 20% OFF
+                  </span>
                 </div>
-                <p className="text-xs text-stone-300 leading-normal">
+                <p className="text-[11px] sm:text-xs text-stone-300 leading-normal">
                   {lang === 'ta' 
                     ? 'ரூ. 500 முதல் ரூ. 5000 வரை வாங்கும் அனைத்து பொருட்களுக்கும் சிறப்பு தள்ளுபடி + Stainless Steel பரிசு இலவசம்!'
                     : 'Get 5% to 20% discount on all purchases from ₹500 to ₹5000 + Free Stainless Steel Gift included!'}
@@ -89,10 +87,10 @@ const HomePage = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-1">
                 <Link
                   to="/shop"
-                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-bold px-7 py-3 rounded-full shadow-lg shadow-amber-500/20 flex items-center gap-2 transition-all transform active:scale-95"
+                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-bold px-6 py-3 rounded-full shadow-lg shadow-amber-500/20 flex items-center gap-2 transition-all transform active:scale-95 text-xs sm:text-sm"
                 >
                   <span>{t.exploreChains}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -100,7 +98,7 @@ const HomePage = () => {
 
                 <Link
                   to="/rent"
-                  className="bg-stone-900/90 hover:bg-stone-800 text-amber-300 border border-amber-500/40 font-semibold px-6 py-3 rounded-full flex items-center gap-2 transition-all"
+                  className="bg-stone-900 hover:bg-stone-800 text-amber-300 border border-amber-500/40 font-semibold px-5 py-3 rounded-full flex items-center gap-2 transition-all text-xs sm:text-sm"
                 >
                   <Calendar className="w-4 h-4 text-amber-400" />
                   <span>{t.rentForWeddings}</span>
@@ -108,36 +106,40 @@ const HomePage = () => {
               </div>
 
               {/* Trust bullets */}
-              <div className="grid grid-cols-3 gap-3 pt-4 border-t border-stone-800/80 text-xs text-stone-400">
-                <div className="flex items-center gap-1.5 justify-center lg:justify-start">
-                  <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
+              <div className="grid grid-cols-3 gap-2 pt-4 border-t border-stone-800 text-[11px] text-stone-400">
+                <div className="flex items-center gap-1 justify-center lg:justify-start min-w-0">
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                   <span className="truncate">{t.warrantyBullet}</span>
                 </div>
-                <div className="flex items-center gap-1.5 justify-center lg:justify-start">
-                  <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+                <div className="flex items-center gap-1 justify-center lg:justify-start min-w-0">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                   <span className="truncate">{t.tryOnBullet}</span>
                 </div>
-                <div className="flex items-center gap-1.5 justify-center lg:justify-start">
-                  <Gift className="w-4 h-4 text-amber-400 shrink-0" />
+                <div className="flex items-center gap-1 justify-center lg:justify-start min-w-0">
+                  <Gift className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                   <span className="truncate">{t.festivalGiftBullet}</span>
                 </div>
               </div>
             </div>
 
-            {/* Right Column: Actual Shop Poster Image (Photo 2) */}
-            <div className="lg:col-span-5 flex justify-center">
-              <div className="relative group max-w-sm sm:max-w-md w-full">
+            {/* Right Column: Poster Image Card (Strict max-width, fully contained) */}
+            <div className="w-full flex justify-center min-w-0">
+              <div className="w-full max-w-sm sm:max-w-md relative group">
                 {/* Glow Backdrop */}
-                <div className="absolute -inset-1.5 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 rounded-3xl blur-md opacity-40 group-hover:opacity-60 transition duration-500" />
+                <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 rounded-3xl blur-md opacity-30 group-hover:opacity-50 transition duration-500 pointer-events-none" />
                 
                 <div className="relative bg-stone-900 rounded-2xl overflow-hidden border-2 border-amber-500/60 shadow-2xl">
                   {/* Shop Info Overlay Header */}
                   <div className="bg-gradient-to-r from-amber-800 via-amber-700 to-amber-900 px-4 py-2.5 flex items-center justify-between text-white border-b border-amber-600/50">
-                    <div className="flex items-center gap-2">
-                      <span className="text-amber-300">👑</span>
-                      <span className="font-serif font-black text-sm tracking-wide">சிங்கப்பூர் பேன்சி & கவரிங்</span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-amber-300 shrink-0">👑</span>
+                      <span className="font-serif font-black text-xs sm:text-sm tracking-wide truncate">
+                        சிங்கப்பூர் பேன்சி & கவரிங்
+                      </span>
                     </div>
-                    <span className="text-[10px] bg-red-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">வந்தவாசி</span>
+                    <span className="text-[10px] bg-red-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider shrink-0">
+                      வந்தவாசி
+                    </span>
                   </div>
 
                   {/* Real Photo 2 Embed */}
@@ -145,20 +147,20 @@ const HomePage = () => {
                     <img
                       src="/images/shop_banner_singapore.jpg"
                       alt="சிங்கப்பூர் பேன்சி & கவரிங் - வந்தவாசி கடை போஸ்டர்"
-                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-500"
                     />
                     
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent pointer-events-none" />
 
-                    {/* Quick Badge at Bottom of Image */}
-                    <div className="absolute bottom-3 left-3 right-3 p-3 rounded-xl bg-black/80 backdrop-blur-md border border-amber-500/40 text-xs text-white flex items-center justify-between">
-                      <div>
-                        <p className="font-bold text-amber-400">49-வது பஜார் வீதி, வந்தவாசி</p>
-                        <p className="text-[10px] text-stone-300">I.O.B வங்கிக்கு எதிரில் | 📞 9884893477</p>
+                    {/* Bottom Details Banner */}
+                    <div className="absolute bottom-3 left-3 right-3 p-3 rounded-xl bg-black/80 backdrop-blur-md border border-amber-500/40 text-xs text-white flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="font-bold text-amber-400 truncate">49-வது பஜார் வீதி, வந்தவாசி</p>
+                        <p className="text-[10px] text-stone-300 truncate">I.O.B வங்கிக்கு எதிரில் • 📞 9884893477</p>
                       </div>
                       <Link
                         to="/contact"
-                        className="bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold px-3 py-1.5 rounded-lg text-[11px] whitespace-nowrap transition-colors"
+                        className="bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold px-3 py-1.5 rounded-lg text-[10px] whitespace-nowrap transition-colors shrink-0"
                       >
                         {lang === 'ta' ? 'வழி & வரைபடம்' : 'Store Map'}
                       </Link>
@@ -172,8 +174,8 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Categories Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* 2. Categories Grid */}
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 tracking-wider uppercase mb-1">
@@ -198,7 +200,7 @@ const HomePage = () => {
               to={`/shop?category=${encodeURIComponent(cat.name)}`}
               className="group bg-white p-4 rounded-2xl border border-stone-200/80 hover:border-amber-400 hover:shadow-xl transition-all duration-300 text-center flex flex-col items-center"
             >
-              <div className="w-16 h-16 rounded-full bg-amber-50 group-hover:bg-amber-100 border border-amber-200/60 flex items-center justify-center text-amber-600 mb-3 text-2xl transition-transform group-hover:scale-110">
+              <div className="w-14 h-14 rounded-full bg-amber-50 group-hover:bg-amber-100 border border-amber-200/60 flex items-center justify-center text-amber-600 mb-3 text-2xl transition-transform group-hover:scale-110">
                 {idx === 0 ? '✨' : idx === 1 ? '🦚' : idx === 2 ? '⛓️' : idx === 3 ? '👑' : '💎'}
               </div>
               <h3 className="font-serif font-bold text-stone-800 text-sm group-hover:text-amber-600 transition-colors line-clamp-1">
@@ -212,9 +214,9 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Deepavali Offer Chains Spotlight */}
+      {/* 3. Deepavali Offer Chains Spotlight */}
       {offerChains.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-gradient-to-r from-red-50 via-amber-50 to-orange-50 border border-red-200 p-6 sm:p-8 rounded-3xl relative overflow-hidden">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4 relative z-10">
               <div className="flex items-center gap-3">
@@ -223,7 +225,6 @@ const HomePage = () => {
                 </div>
                 <div>
                   <div className="inline-flex items-center gap-1.5 text-xs font-bold text-red-600 tracking-wider uppercase">
-                    <Flame className="w-3.5 h-3.5" />
                     <span>{t.festivalOffersBadge}</span>
                   </div>
                   <h2 className="text-2xl sm:text-3xl font-serif font-black text-stone-900">
@@ -254,8 +255,8 @@ const HomePage = () => {
         </section>
       )}
 
-      {/* Featured Chains Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* 4. Featured Chains Section */}
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 tracking-wider uppercase mb-1">
@@ -285,8 +286,8 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Bridal Rental Service Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* 5. Bridal Rental Service Banner */}
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-stone-900 via-amber-950 to-stone-900 text-white p-8 sm:p-12 border border-amber-600/40 shadow-2xl">
           <div className="max-w-2xl space-y-4">
             <span className="inline-block px-3 py-1 bg-amber-500/20 text-amber-300 border border-amber-400/30 rounded-full text-xs font-bold tracking-wider uppercase">
