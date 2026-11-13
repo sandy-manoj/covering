@@ -3,6 +3,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const path = require('path');
+const fs = require('fs');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 
@@ -10,23 +11,30 @@ dotenv.config();
 
 const app = express();
 
-// Connect to MongoDB
+// Connect to MongoDB / Supabase
 connectDB();
 
 // Middleware
 app.use(helmet({
-  crossOriginResourcePolicy: false // Allow loading static uploads/images across client and admin
+  crossOriginResourcePolicy: false,
+  contentSecurityPolicy: false
 }));
 app.use(cors({
-  origin: '*', // Allow Vite client and admin during development & production
+  origin: '*',
   credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
-// Static folder for uploaded files (chain photos, 3d models, tryon pngs)
+// Static folder for uploaded files
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+
+// Serve Client Static Build when deployed on Render
+const clientDistPath = path.join(__dirname, '../client/dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+}
 
 // API Routes
 app.use('/api/admin', require('./routes/authRoutes'));
@@ -40,9 +48,25 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'online',
     timestamp: new Date(),
-    service: 'Gold Covering Chain Shop API'
+    service: 'Singapore Fancy & Covering API',
+    shop: 'சிங்கப்பூர் பேன்சி & கவரிங் - வந்தவாசி'
   });
 });
+
+// Single Page Application (SPA) fallback to index.html
+if (fs.existsSync(clientDistPath)) {
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+} else {
+  app.get('/', (req, res) => {
+    res.json({
+      message: 'Singapore Fancy API is Live! Client app is building...',
+      health: '/api/health',
+      products: '/api/products'
+    });
+  });
+}
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -55,6 +79,5 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
-
