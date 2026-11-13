@@ -395,7 +395,7 @@ const Hero3DChain = ({ style = 'haram', onModelReady }) => {
 
         // E. Center Teardrop Ruby Gemstone
         const rubyGeo = new THREE.SphereGeometry(s * 0.28, 12, 12);
-        rubyGeo.scale.set(1.0, 1.4, 0.7); // Safe Vector3 scale
+        rubyGeo.scale(1.0, 1.4, 0.7); // BufferGeometry uses .scale(x, y, z)
         const rubyMesh = new THREE.Mesh(rubyGeo, rubyMat);
         rubyMesh.position.set(0, -s * 1.15, 0.035 * scaleFactor);
         pGroup.add(rubyMesh);
