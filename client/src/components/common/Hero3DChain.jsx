@@ -2,10 +2,12 @@ import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
-const Hero3DChain = ({ style = 'curb' }) => {
+const Hero3DChain = ({ style = 'haram' }) => {
   const containerRef = useRef(null);
   const [loading, setLoading] = useState(true);
+  const [modelType, setModelType] = useState('loading'); // 'glb' | 'procedural'
 
   useEffect(() => {
     const container = containerRef.current;
@@ -13,41 +15,42 @@ const Hero3DChain = ({ style = 'curb' }) => {
 
     // 1. Scene, Camera, Renderer
     const width = container.clientWidth || 400;
-    const height = container.clientHeight || 420;
+    const height = container.clientHeight || 460;
 
     const scene = new THREE.Scene();
 
-    const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-    camera.position.set(0, 0, 3.6);
+    const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
+    camera.position.set(0, 0, 3.8);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.25;
+    renderer.toneMappingExposure = 1.15;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
 
-    // 2. RoomEnvironment for Metallic Gold Reflections
+    // 2. RoomEnvironment for Authentic Antique Gold PBR Reflections
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     pmremGenerator.compileEquirectangularShader();
     const roomEnv = new RoomEnvironment();
     scene.environment = pmremGenerator.fromScene(roomEnv).texture;
 
-    // 3. Studio Lights
-    const ambientLight = new THREE.AmbientLight(0xfff5e6, 0.8);
+    // 3. Studio Lighting: Warm Key + Cool Rim + Soft Ambient
+    const ambientLight = new THREE.AmbientLight(0xfff8ee, 0.9);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
-    keyLight.position.set(5, 6, 4);
+    const keyLight = new THREE.DirectionalLight(0xfffaed, 2.4);
+    keyLight.position.set(4, 5, 4);
     scene.add(keyLight);
 
-    const rimLight = new THREE.DirectionalLight(0xffd54f, 1.8);
-    rimLight.position.set(-5, -2, -3);
+    const rimLight = new THREE.DirectionalLight(0xd4af37, 1.8);
+    rimLight.position.set(-4, -3, -3);
     scene.add(rimLight);
 
-    // 4. Subtle Gold Sparkle Particle Field
-    const particleCount = 45;
+    // 4. Subtle Gold Dust Particle Field
+    const particleCount = 40;
     const particleGeo = new THREE.BufferGeometry();
     const posArray = new Float32Array(particleCount * 3);
     for (let i = 0; i < particleCount * 3; i += 3) {
@@ -57,8 +60,8 @@ const Hero3DChain = ({ style = 'curb' }) => {
     }
     particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
     const particleMat = new THREE.PointsMaterial({
-      size: 0.035,
-      color: 0xffe082,
+      size: 0.032,
+      color: 0xffd54f,
       transparent: true,
       opacity: 0.65,
       blending: THREE.AdditiveBlending
@@ -66,112 +69,261 @@ const Hero3DChain = ({ style = 'curb' }) => {
     const particles = new THREE.Points(particleGeo, particleMat);
     scene.add(particles);
 
-    // 5. Build Interlocked Gold Chain Geometry along CatmullRomCurve3
-    const chainGroup = new THREE.Group();
-
-    // Natural sagging U-curve for necklace
-    const curvePoints = [
-      new THREE.Vector3(-1.1, 0.85, -0.2),
-      new THREE.Vector3(-0.95, 0.35, 0.05),
-      new THREE.Vector3(-0.6, -0.35, 0.3),
-      new THREE.Vector3(0, -0.85, 0.45), // lowest sagging center point
-      new THREE.Vector3(0.6, -0.35, 0.3),
-      new THREE.Vector3(0.95, 0.35, 0.05),
-      new THREE.Vector3(1.1, 0.85, -0.2)
-    ];
-    const curve = new THREE.CatmullRomCurve3(curvePoints, false, 'centripetal');
-
-    // Luxury Gold PBR Material
-    const goldMaterial = new THREE.MeshPhysicalMaterial({
+    // 5. Materials
+    // Antique Matte Gold Material matching photo (metalness 1, roughness 0.42, not mirror-shiny)
+    const antiqueGoldMat = new THREE.MeshPhysicalMaterial({
       color: 0xD4AF37,
       metalness: 1.0,
-      roughness: 0.22,
-      clearcoat: 0.35,
-      clearcoatRoughness: 0.1,
-      reflectivity: 1.0
+      roughness: 0.42,
+      clearcoat: 0.25,
+      clearcoatRoughness: 0.15
     });
 
-    // 120 interlocking links
-    const linkCount = 110;
-    const linkGeo = new THREE.TorusGeometry(0.042, 0.015, 14, 28);
-    const instancedChain = new THREE.InstancedMesh(linkGeo, goldMaterial, linkCount);
-
-    const dummy = new THREE.Object3D();
-    for (let i = 0; i < linkCount; i++) {
-      const t = i / (linkCount - 1);
-      const pt = curve.getPointAt(t);
-      const tangent = curve.getTangentAt(t).normalize();
-
-      dummy.position.copy(pt);
-      dummy.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tangent);
-
-      // Interlocking: alternate links rotated 90 degrees
-      if (i % 2 === 0) {
-        dummy.rotateY(Math.PI / 2);
-      }
-      dummy.updateMatrix();
-      instancedChain.setMatrixAt(i, dummy.matrix);
-    }
-    instancedChain.instanceMatrix.needsUpdate = true;
-    chainGroup.add(instancedChain);
-
-    // 6. Pendant at lowest point (Heart / Mango Mugappu motif)
-    const lowestPt = curve.getPointAt(0.5);
-    const pendantGroup = new THREE.Group();
-    pendantGroup.position.copy(lowestPt);
-
-    // Bail Ring
-    const bail = new THREE.Mesh(new THREE.TorusGeometry(0.035, 0.012, 10, 20), goldMaterial);
-    bail.position.y = -0.02;
-    pendantGroup.add(bail);
-
-    // Heart / Tear Drop Solid Gold Mesh
-    const heartShape = new THREE.Shape();
-    heartShape.moveTo(0, 0);
-    heartShape.bezierCurveTo(0, 0.05, -0.1, 0.12, -0.15, 0.05);
-    heartShape.bezierCurveTo(-0.2, -0.02, -0.1, -0.1, 0, -0.22);
-    heartShape.bezierCurveTo(0.1, -0.1, 0.2, -0.02, 0.15, 0.05);
-    heartShape.bezierCurveTo(0.1, 0.12, 0, 0.05, 0, 0);
-    const heartGeo = new THREE.ExtrudeGeometry(heartShape, {
-      depth: 0.035,
-      bevelEnabled: true,
-      bevelSegments: 4,
-      bevelSize: 0.012,
-      bevelThickness: 0.012
+    // Emerald Green Enamel Oval Material (color 0x0f6b3a, glossy, clearcoat)
+    const greenEnamelMat = new THREE.MeshPhysicalMaterial({
+      color: 0x0f6b3a,
+      metalness: 0.35,
+      roughness: 0.18,
+      clearcoat: 0.85,
+      clearcoatRoughness: 0.08
     });
-    const heartMesh = new THREE.Mesh(heartGeo, goldMaterial);
-    heartMesh.position.set(0, -0.07, 0);
-    pendantGroup.add(heartMesh);
 
-    // Center ruby stone gem
-    const gemGeo = new THREE.SphereGeometry(0.045, 16, 16);
-    gemGeo.scale(1, 1.3, 0.6);
-    const gemMat = new THREE.MeshPhysicalMaterial({
-      color: 0x990012,
+    // Ruby Gemstone Accent
+    const rubyMat = new THREE.MeshPhysicalMaterial({
+      color: 0x8b0000,
       metalness: 0.2,
-      roughness: 0.1,
-      transmission: 0.8,
-      thickness: 0.5
+      roughness: 0.15,
+      clearcoat: 0.9
     });
-    const gemMesh = new THREE.Mesh(gemGeo, gemMat);
-    gemMesh.position.set(0, -0.14, 0.02);
-    pendantGroup.add(gemMesh);
 
-    chainGroup.add(pendantGroup);
+    const rootGroup = new THREE.Group();
+    scene.add(rootGroup);
 
-    // Center and auto-fit in camera frame
-    chainGroup.position.set(0, 0.1, 0);
-    scene.add(chainGroup);
+    // 6. PATH A: Try Loading real /assets/models/haram.glb
+    const gltfLoader = new GLTFLoader();
+    // Path where user or admin uploads the GLB
+    const glbPath = '/assets/models/haram.glb';
+
+    gltfLoader.load(
+      glbPath,
+      (gltf) => {
+        const model = gltf.scene;
+        // Compute bounding box and auto-fit
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        model.position.sub(center);
+
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 2.4 / maxDim;
+        model.scale.setScalar(scale);
+
+        // Apply antique PBR tune
+        model.traverse((child) => {
+          if (child.isMesh && child.material) {
+            child.material.roughness = 0.42;
+            child.material.metalness = 1.0;
+            child.castShadow = true;
+          }
+        });
+
+        rootGroup.add(model);
+        setModelType('glb');
+        setLoading(false);
+      },
+      undefined,
+      (error) => {
+        // PATH B FALLBACK: Realistic Hand-Crafted Antique Temple Haram with Lakshmi Pendants & Jhumkas
+        console.log('GLB not found, using High-Fidelity Temple Haram Geometry (Path B)');
+        buildAntiqueTempleHaram();
+        setModelType('procedural');
+        setLoading(false);
+      }
+    );
+
+    // PATH B Procedural Temple Haram Builder matching the user's photo
+    function buildAntiqueTempleHaram() {
+      const haramGroup = new THREE.Group();
+
+      // --- A. Dual Strand of Dense Hand-Cast Gold Beads along CatmullRomCurve3 ---
+      const outerCurvePoints = [
+        new THREE.Vector3(-0.95, 1.15, -0.2),
+        new THREE.Vector3(-0.85, 0.5, 0.05),
+        new THREE.Vector3(-0.6, -0.25, 0.25),
+        new THREE.Vector3(0, -0.65, 0.38),
+        new THREE.Vector3(0.6, -0.25, 0.25),
+        new THREE.Vector3(0.85, 0.5, 0.05),
+        new THREE.Vector3(0.95, 1.15, -0.2)
+      ];
+      const outerCurve = new THREE.CatmullRomCurve3(outerCurvePoints, false, 'centripetal');
+
+      // Instanced Hand-Cast Beads (jittered scale 0.85-1.15)
+      const beadCount = 140;
+      const beadGeo = new THREE.SphereGeometry(0.024, 12, 12);
+      const outerBeads = new THREE.InstancedMesh(beadGeo, antiqueGoldMat, beadCount);
+      const dummy = new THREE.Object3D();
+
+      for (let i = 0; i < beadCount; i++) {
+        const t = i / (beadCount - 1);
+        const pt = outerCurve.getPointAt(t);
+        const tangent = outerCurve.getTangentAt(t).normalize();
+
+        // Small jitter for hand-cast look
+        const jitter = (Math.sin(i * 3.7) * 0.008);
+        dummy.position.set(pt.x + jitter, pt.y + jitter, pt.z);
+        const scaleJitter = 0.88 + Math.sin(i * 5.2) * 0.22;
+        dummy.scale.set(scaleJitter, scaleJitter, scaleJitter);
+        dummy.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tangent);
+        dummy.updateMatrix();
+        outerBeads.setMatrixAt(i, dummy.matrix);
+      }
+      outerBeads.instanceMatrix.needsUpdate = true;
+      haramGroup.add(outerBeads);
+
+      // --- B. Grand Central Lakshmi Pendant on Green Enamel Oval ---
+      const centerPoint = outerCurve.getPointAt(0.5); // (0, -0.65, 0.38)
+      const mainPendantGroup = new THREE.Group();
+      mainPendantGroup.position.set(0, -0.68, 0.4);
+
+      // 1. Ornate Gold Filigree Frame
+      const frameGeo = new THREE.TorusGeometry(0.24, 0.038, 14, 32);
+      frameGeo.scale(1.15, 1.35, 1.0);
+      const filigreeFrame = new THREE.Mesh(frameGeo, antiqueGoldMat);
+      mainPendantGroup.add(filigreeFrame);
+
+      // 2. Green Enamel Oval Plaque
+      const plaqueGeo = new THREE.CylinderGeometry(0.22, 0.22, 0.02, 32);
+      plaqueGeo.rotateX(Math.PI / 2);
+      plaqueGeo.scale(1.1, 1.3, 1.0);
+      const enamelPlaque = new THREE.Mesh(plaqueGeo, greenEnamelMat);
+      enamelPlaque.position.z = -0.01;
+      mainPendantGroup.add(enamelPlaque);
+
+      // 3. Central Lakshmi Figurine / Deity Motif in Gold
+      const deityGroup = new THREE.Group();
+      deityGroup.position.set(0, -0.02, 0.02);
+
+      // Head & Crown (Kireedam)
+      const crown = new THREE.Mesh(new THREE.ConeGeometry(0.038, 0.08, 12), antiqueGoldMat);
+      crown.position.y = 0.08;
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.04, 14, 14), antiqueGoldMat);
+      head.position.y = 0.03;
+
+      // Torso & Seated Lotus Base
+      const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.065, 0.08, 12), antiqueGoldMat);
+      torso.position.y = -0.04;
+      const lotusBase = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.08, 0.04, 16), antiqueGoldMat);
+      lotusBase.position.y = -0.1;
+
+      // 4 Blessing Arms
+      const armGeo = new THREE.TorusGeometry(0.055, 0.014, 8, 16);
+      const armsL = new THREE.Mesh(armGeo, antiqueGoldMat);
+      armsL.position.set(-0.06, -0.02, 0);
+      const armsR = new THREE.Mesh(armGeo, antiqueGoldMat);
+      armsR.position.set(0.06, -0.02, 0);
+
+      deityGroup.add(crown, head, torso, lotusBase, armsL, armsR);
+      mainPendantGroup.add(deityGroup);
+
+      // 4. Twin Peacocks (Mayil) on Left and Right of Pendant
+      const peacockGeo = new THREE.TorusGeometry(0.08, 0.02, 10, 20);
+      const peacockL = new THREE.Mesh(peacockGeo, antiqueGoldMat);
+      peacockL.position.set(-0.25, 0.06, 0);
+      peacockL.rotateZ(0.6);
+      const peacockR = new THREE.Mesh(peacockGeo, antiqueGoldMat);
+      peacockR.position.set(0.25, 0.06, 0);
+      peacockR.rotateZ(-0.6);
+      mainPendantGroup.add(peacockL, peacockR);
+
+      // 5. Hanging Gold Bead Jhumki Drops at Bottom of Main Pendant
+      for (let j = -3; j <= 3; j++) {
+        const drop = new THREE.Mesh(new THREE.SphereGeometry(0.02, 10, 10), antiqueGoldMat);
+        drop.position.set(j * 0.055, -0.28 - Math.abs(j) * 0.015, 0);
+        mainPendantGroup.add(drop);
+      }
+
+      haramGroup.add(mainPendantGroup);
+
+      // --- C. Second Smaller Lakshmi Medallion Placed Lower Down ---
+      const lowerMedallion = new THREE.Group();
+      lowerMedallion.position.set(0, -1.18, 0.42);
+
+      const smallFrame = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.024, 12, 24), antiqueGoldMat);
+      smallFrame.scale(1.1, 1.25, 1.0);
+      const smallEnamel = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.015, 24), greenEnamelMat);
+      smallEnamel.rotateX(Math.PI / 2);
+      smallEnamel.scale(1.05, 1.2, 1.0);
+
+      const smallDeity = deityGroup.clone();
+      smallDeity.scale.set(0.58, 0.58, 0.58);
+      smallDeity.position.set(0, 0, 0.015);
+
+      lowerMedallion.add(smallFrame, smallEnamel, smallDeity);
+      haramGroup.add(lowerMedallion);
+
+      // --- D. Matching Jhumka Earrings & Maang Tikka (Left, Right, Top) ---
+      // Left Jhumka
+      const jhumkaL = buildJhumka();
+      jhumkaL.position.set(-1.15, 0.1, 0.15);
+      // Right Jhumka
+      const jhumkaR = buildJhumka();
+      jhumkaR.position.set(1.15, 0.1, 0.15);
+      // Maang Tikka (at center top)
+      const tikka = buildJhumka();
+      tikka.scale.set(0.75, 0.75, 0.75);
+      tikka.position.set(0, 1.05, 0.05);
+
+      haramGroup.add(jhumkaL, jhumkaR, tikka);
+
+      // Center the whole set
+      haramGroup.position.set(0, 0.15, 0);
+      rootGroup.add(haramGroup);
+    }
+
+    // Helper to build traditional South Indian bell jhumka
+    function buildJhumka() {
+      const jGroup = new THREE.Group();
+      // Stud top
+      const stud = new THREE.Mesh(new THREE.SphereGeometry(0.04, 14, 14), antiqueGoldMat);
+      const rubyStud = new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 10), rubyMat);
+      rubyStud.position.z = 0.025;
+      jGroup.add(stud, rubyStud);
+
+      // Connecting ring
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.02, 0.008, 8, 16), antiqueGoldMat);
+      ring.position.y = -0.06;
+      jGroup.add(ring);
+
+      // Bell Dome (Koodai)
+      const bell = new THREE.Mesh(new THREE.SphereGeometry(0.08, 16, 16, 0, Math.PI * 2, 0, Math.PI * 0.5), antiqueGoldMat);
+      bell.position.y = -0.15;
+      bell.rotateX(Math.PI);
+      jGroup.add(bell);
+
+      // Hanging gold pearls
+      for (let p = 0; p < 7; p++) {
+        const ang = (p / 7) * Math.PI * 2;
+        const pearl = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 8), antiqueGoldMat);
+        pearl.position.set(Math.cos(ang) * 0.075, -0.16, Math.sin(ang) * 0.075);
+        jGroup.add(pearl);
+      }
+
+      jGroup.scale.set(0.9, 0.9, 0.9);
+      return jGroup;
+    }
 
     // 7. OrbitControls with Auto-Rotate and Touch Pause
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
     controls.autoRotate = true;
-    controls.autoRotateSpeed = 1.4;
+    controls.autoRotateSpeed = 1.2;
     controls.enableZoom = true;
     controls.minDistance = 2.0;
-    controls.maxDistance = 4.8;
+    controls.maxDistance = 5.0;
+    // Polar angle clamped so user cannot flip upside down
+    controls.minPolarAngle = Math.PI * 0.2;
+    controls.maxPolarAngle = Math.PI * 0.75;
     controls.enablePan = false;
 
     let touchTimeout = null;
@@ -211,11 +363,10 @@ const Hero3DChain = ({ style = 'curb' }) => {
       const delta = clock.getDelta();
       controls.update();
 
-      // Gentle floating sparkle motion
-      particles.rotation.y += delta * 0.05;
+      // Subtle particle float
+      particles.rotation.y += delta * 0.04;
 
       renderer.render(scene, camera);
-      if (loading) setLoading(false);
     };
     animate();
 
@@ -231,11 +382,11 @@ const Hero3DChain = ({ style = 'curb' }) => {
   }, [style]);
 
   return (
-    <div className="w-full h-full min-h-[380px] sm:min-h-[440px] relative flex items-center justify-center">
+    <div className="w-full h-full min-h-[400px] sm:min-h-[460px] relative flex items-center justify-center">
       {loading && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-amber-400 text-xs gap-2 z-10">
-          <div className="w-7 h-7 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
-          <span>Rendering 3D Gold Model...</span>
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-amber-400 text-xs gap-2 z-10 bg-stone-950/80">
+          <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+          <span>Loading Temple Haram Model...</span>
         </div>
       )}
       <div ref={containerRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
