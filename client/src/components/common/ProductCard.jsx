@@ -86,10 +86,10 @@ const ProductCard = ({ product, onTryOn, onView3D }) => {
             </button>
           </div>
 
-          {/* Slide-up Buttons: Try On & 360° */}
-          <div className="absolute inset-x-2 bottom-2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-200 z-10">
+          {/* Slide-up Buttons: Try On & 360° — desktop hover only, never triggered by tapping the product card itself */}
+          <div className="absolute inset-x-2 bottom-2 items-center gap-1.5 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-200 z-10 hidden sm:flex">
             <button
-              onClick={() => onTryOn && onTryOn(product)}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onTryOn && onTryOn(product); }}
               className="flex-1 bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold text-[11px] py-1.5 rounded-xl shadow-md flex items-center justify-center gap-1 transition-colors"
             >
               <Video className="w-3.5 h-3.5" />
@@ -97,7 +97,7 @@ const ProductCard = ({ product, onTryOn, onView3D }) => {
             </button>
 
             <button
-              onClick={() => onView3D && onView3D(product)}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onView3D && onView3D(product); }}
               className="flex-1 bg-stone-900/90 hover:bg-stone-900 text-white font-bold text-[11px] py-1.5 rounded-xl shadow-md flex items-center justify-center gap-1 transition-colors"
             >
               <Rotate3D className="w-3.5 h-3.5 text-amber-400" />
