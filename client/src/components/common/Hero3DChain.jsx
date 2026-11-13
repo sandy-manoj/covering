@@ -99,47 +99,43 @@ const Hero3DChain = ({ style = 'haram' }) => {
     const rootGroup = new THREE.Group();
     scene.add(rootGroup);
 
-    // 6. PATH A: Try Loading real /assets/models/haram.glb
-    const gltfLoader = new GLTFLoader();
-    // Path where user or admin uploads the GLB
+    // Build realistic Antique Temple Haram immediately so the 3D viewer is never stuck loading
+    buildAntiqueTempleHaram();
+    setLoading(false);
+    setModelType('procedural');
+
+    // Optional GLB upgrade if custom file is placed in public folder
     const glbPath = '/assets/models/haram.glb';
-
-    gltfLoader.load(
-      glbPath,
-      (gltf) => {
-        const model = gltf.scene;
-        // Compute bounding box and auto-fit
-        const box = new THREE.Box3().setFromObject(model);
-        const center = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
-        model.position.sub(center);
-
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const scale = 2.4 / maxDim;
-        model.scale.setScalar(scale);
-
-        // Apply antique PBR tune
-        model.traverse((child) => {
-          if (child.isMesh && child.material) {
-            child.material.roughness = 0.42;
-            child.material.metalness = 1.0;
-            child.castShadow = true;
-          }
-        });
-
-        rootGroup.add(model);
-        setModelType('glb');
-        setLoading(false);
-      },
-      undefined,
-      (error) => {
-        // PATH B FALLBACK: Realistic Hand-Crafted Antique Temple Haram with Lakshmi Pendants & Jhumkas
-        console.log('GLB not found, using High-Fidelity Temple Haram Geometry (Path B)');
-        buildAntiqueTempleHaram();
-        setModelType('procedural');
-        setLoading(false);
-      }
-    );
+    fetch(glbPath, { method: 'HEAD' })
+      .then((res) => {
+        const contentType = res.headers.get('content-type') || '';
+        if (res.ok && !contentType.includes('text/html')) {
+          const gltfLoader = new GLTFLoader();
+          gltfLoader.load(glbPath, (gltf) => {
+            while (rootGroup.children.length > 0) {
+              rootGroup.remove(rootGroup.children[0]);
+            }
+            const model = gltf.scene;
+            const box = new THREE.Box3().setFromObject(model);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+            model.position.sub(center);
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const scale = 2.4 / maxDim;
+            model.scale.setScalar(scale);
+            model.traverse((child) => {
+              if (child.isMesh && child.material) {
+                child.material.roughness = 0.42;
+                child.material.metalness = 1.0;
+                child.castShadow = true;
+              }
+            });
+            rootGroup.add(model);
+            setModelType('glb');
+          }, undefined, () => {});
+        }
+      })
+      .catch(() => {});
 
     // PATH B Procedural Temple Haram Builder matching the user's photo
     function buildAntiqueTempleHaram() {
