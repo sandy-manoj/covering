@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, ArrowRight, ShieldCheck, Calendar, ChevronRight, Gift, Percent } from 'lucide-react';
-import { getProducts, getBanners, getCategories, getSettings } from '../services/api';
+import { Sparkles, ArrowRight, ShieldCheck, Calendar, ChevronRight, Gift, Percent, Clock } from 'lucide-react';
+import { getProducts, getCategories, getSettings } from '../services/api';
 import ProductCard from '../components/common/ProductCard';
 import Product3DViewerModal from '../components/viewer3d/Product3DViewerModal';
 import VirtualTryOnModal from '../components/tryon/VirtualTryOnModal';
+import Hero3DChain from '../components/common/Hero3DChain';
 import { useLanguageStore, translations } from '../store/useLanguageStore';
 
 const HomePage = () => {
@@ -19,6 +20,9 @@ const HomePage = () => {
 
   const [selectedTryOnProduct, setSelectedTryOnProduct] = useState(null);
   const [selected3DProduct, setSelected3DProduct] = useState(null);
+
+  // Live Deepavali countdown timer
+  const [timeLeft, setTimeLeft] = useState({ days: 12, hours: 8, minutes: 45, seconds: 30 });
 
   useEffect(() => {
     getSettings().then((res) => {
@@ -35,62 +39,85 @@ const HomePage = () => {
       setFeaturedChains(prods.filter((p) => p.isFeatured).slice(0, 4));
       setOfferChains(prods.filter((p) => p.hasOffer).slice(0, 4));
     }).catch(console.error);
+
+    // Live countdown timer
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
+        if (prev.minutes > 0) return { ...prev, minutes: 59, seconds: 59 };
+        if (prev.hours > 0) return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
+        if (prev.days > 0) return { ...prev, days: prev.days - 1, hours: 23, minutes: 59, seconds: 59 };
+        return prev;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
 
   return (
-    <div className="w-full space-y-16 pb-20 overflow-x-clip">
+    <div className="w-full space-y-16 pb-20 overflow-x-clip bg-[#FAF9F6]">
       
-      {/* 1. Hero Banner Section (Clean 2-Column Responsive Layout) */}
-      <section className="w-full relative bg-gradient-to-br from-stone-950 via-amber-950/40 to-stone-950 text-white overflow-hidden py-10 sm:py-16 border-b border-amber-900/40">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
+      {/* 1. Hero Section (Deep Maroon to Rich Black Gradient + Real-time 3D Chain) */}
+      <section className="w-full relative bg-gradient-to-br from-[#2b0808] via-[#1a0808] to-[#110505] text-white overflow-hidden py-10 lg:py-16 border-b border-amber-900/40">
         
+        {/* Soft Diya Sparkle Backdrop */}
+        <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#d4af37_1.2px,transparent_1.2px)] [background-size:24px_24px] pointer-events-none" />
+
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
             
-            {/* Left Column: Text & CTAs (No negative offsets, clean left alignment) */}
-            <div className="space-y-5 text-center lg:text-left min-w-0">
+            {/* Left Column: Headline, Festival Offer Card, & CTAs */}
+            <div className="lg:col-span-7 space-y-5 text-center lg:text-left min-w-0">
               
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold tracking-wide uppercase max-w-full">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                 <span className="truncate">{t.heroBadge}</span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-serif font-black tracking-tight text-white leading-tight break-words">
+              {/* Shimmering Gold Typography */}
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-black tracking-tight text-white leading-tight break-words">
                 {t.heroTitle} <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ffe082] via-[#ffd54f] to-[#ffb300] gold-shimmer">
                   {t.heroTitleAccent}
                 </span>
               </h1>
 
-              <p className="text-stone-300 text-sm sm:text-base max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
+              <p className="text-stone-300 text-xs sm:text-sm max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
                 {t.heroDesc}
               </p>
 
-              {/* Festive Offer Card (Relative parent, strictly contained) */}
-              <div className="w-full p-4 rounded-2xl bg-gradient-to-r from-red-950/90 via-stone-900 to-amber-950/90 border border-red-800/40 shadow-xl space-y-2 text-left relative overflow-hidden">
-                <div className="flex items-center justify-between gap-2 text-amber-400 font-serif font-bold text-xs sm:text-sm">
+              {/* Festival Offer Box with Live Deepavali Countdown */}
+              <div className="w-full p-4 rounded-2xl bg-gradient-to-r from-red-950/90 via-[#310c0c] to-amber-950/90 border border-red-700/50 shadow-2xl space-y-3 text-left relative overflow-hidden">
+                <div className="flex items-center justify-between gap-2 text-amber-300 font-serif font-bold text-xs sm:text-sm">
                   <div className="flex items-center gap-2 min-w-0">
                     <Gift className="w-4 h-4 text-amber-400 shrink-0 animate-bounce" />
                     <span className="truncate">
-                      {lang === 'ta' ? 'தீபாவளி சிறப்பு சலுகை & பரிசு!' : 'Deepavali Special Discount & Free Gift!'}
+                      {lang === 'ta' ? 'தீபாவளி சிறப்பு தள்ளுபடி + Stainless Steel பரிசு இலவசம்!' : 'Deepavali Special Discount + Free Stainless Steel Gift!'}
                     </span>
                   </div>
-                  <span className="bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-sans font-bold shrink-0">
+                  <span className="bg-red-600 text-white text-[10px] px-2.5 py-0.5 rounded-full font-sans font-black shrink-0">
                     5% - 20% OFF
                   </span>
                 </div>
-                <p className="text-[11px] sm:text-xs text-stone-300 leading-normal">
-                  {lang === 'ta' 
-                    ? 'ரூ. 500 முதல் ரூ. 5000 வரை வாங்கும் அனைத்து பொருட்களுக்கும் சிறப்பு தள்ளுபடி + Stainless Steel பரிசு இலவசம்!'
-                    : 'Get 5% to 20% discount on all purchases from ₹500 to ₹5000 + Free Stainless Steel Gift included!'}
-                </p>
+
+                {/* Countdown Timer Row */}
+                <div className="flex items-center gap-2 pt-1 border-t border-red-800/40 text-amber-200 text-xs">
+                  <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span className="font-semibold">{lang === 'ta' ? 'சலுகை முடியும் நேரம்:' : 'Offer Ends In:'}</span>
+                  <div className="flex items-center gap-1.5 font-mono font-bold text-white text-xs">
+                    <span className="bg-black/60 px-2 py-0.5 rounded border border-amber-500/30">{timeLeft.days}d</span>:
+                    <span className="bg-black/60 px-2 py-0.5 rounded border border-amber-500/30">{timeLeft.hours}h</span>:
+                    <span className="bg-black/60 px-2 py-0.5 rounded border border-amber-500/30">{timeLeft.minutes}m</span>:
+                    <span className="bg-black/60 px-2 py-0.5 rounded border border-amber-500/30 text-amber-400">{timeLeft.seconds}s</span>
+                  </div>
+                </div>
               </div>
 
-              {/* Action Buttons */}
+              {/* Action Buttons (CTAs visible without scrolling) */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-1">
                 <Link
                   to="/shop"
-                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-bold px-6 py-3 rounded-full shadow-lg shadow-amber-500/20 flex items-center gap-2 transition-all transform active:scale-95 text-xs sm:text-sm"
+                  className="bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-black px-7 py-3 rounded-full shadow-lg shadow-amber-500/30 flex items-center gap-2 transition-all transform active:scale-95 text-xs sm:text-sm"
                 >
                   <span>{t.exploreChains}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -98,15 +125,15 @@ const HomePage = () => {
 
                 <Link
                   to="/rent"
-                  className="bg-stone-900 hover:bg-stone-800 text-amber-300 border border-amber-500/40 font-semibold px-5 py-3 rounded-full flex items-center gap-2 transition-all text-xs sm:text-sm"
+                  className="bg-stone-900/90 hover:bg-stone-800 text-amber-300 border border-amber-500/40 font-bold px-6 py-3 rounded-full flex items-center gap-2 transition-all text-xs sm:text-sm"
                 >
                   <Calendar className="w-4 h-4 text-amber-400" />
                   <span>{t.rentForWeddings}</span>
                 </Link>
               </div>
 
-              {/* Trust bullets */}
-              <div className="grid grid-cols-3 gap-2 pt-4 border-t border-stone-800 text-[11px] text-stone-400">
+              {/* Trust Indicators */}
+              <div className="grid grid-cols-3 gap-2 pt-3 border-t border-stone-800/80 text-[11px] text-stone-400">
                 <div className="flex items-center gap-1 justify-center lg:justify-start min-w-0">
                   <ShieldCheck className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                   <span className="truncate">{t.warrantyBullet}</span>
@@ -122,59 +149,48 @@ const HomePage = () => {
               </div>
             </div>
 
-            {/* Right Column: Poster Image Card (Strict max-width, fully contained) */}
-            <div className="w-full flex justify-center min-w-0">
-              <div className="w-full max-w-sm sm:max-w-md relative group">
-                {/* Glow Backdrop */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 rounded-3xl blur-md opacity-30 group-hover:opacity-50 transition duration-500 pointer-events-none" />
+            {/* Right Column: Real-time 3D Chain + Floating Diya Poster */}
+            <div className="lg:col-span-5 relative flex items-center justify-center min-w-0">
+              
+              {/* Luxury Ambient Glow Frame */}
+              <div className="w-full max-w-sm sm:max-w-md bg-gradient-to-b from-stone-900 via-stone-950 to-black rounded-3xl border-2 border-amber-500/50 shadow-2xl overflow-hidden relative group">
                 
-                <div className="relative bg-stone-900 rounded-2xl overflow-hidden border-2 border-amber-500/60 shadow-2xl">
-                  {/* Shop Info Overlay Header */}
-                  <div className="bg-gradient-to-r from-amber-800 via-amber-700 to-amber-900 px-4 py-2.5 flex items-center justify-between text-white border-b border-amber-600/50">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-amber-300 shrink-0">👑</span>
-                      <span className="font-serif font-black text-xs sm:text-sm tracking-wide truncate">
-                        சிங்கப்பூர் பேன்சி & கவரிங்
-                      </span>
-                    </div>
-                    <span className="text-[10px] bg-red-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider shrink-0">
-                      வந்தவாசி
-                    </span>
+                {/* 3D Header Bar */}
+                <div className="bg-gradient-to-r from-amber-900 via-amber-800 to-amber-950 px-4 py-2 flex items-center justify-between text-white text-xs border-b border-amber-600/40">
+                  <div className="flex items-center gap-1.5 font-serif font-bold">
+                    <span>👑</span>
+                    <span>3D Interactive Chain</span>
                   </div>
+                  <span className="bg-amber-500 text-stone-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
+                    Touch & Spin
+                  </span>
+                </div>
 
-                  {/* Real Photo 2 Embed */}
-                  <div className="relative bg-black aspect-[3/4] overflow-hidden">
-                    <img
-                      src="/images/shop_banner_singapore.jpg"
-                      alt="சிங்கப்பூர் பேன்சி & கவரிங் - வந்தவாசி கடை போஸ்டர்"
-                      className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-500"
-                    />
-                    
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent pointer-events-none" />
+                {/* Live Real-time 3D Canvas */}
+                <Suspense fallback={<div className="h-72 flex items-center justify-center text-amber-400 text-xs">Loading 3D Gold...</div>}>
+                  <Hero3DChain style="rope" />
+                </Suspense>
 
-                    {/* Bottom Details Banner */}
-                    <div className="absolute bottom-3 left-3 right-3 p-3 rounded-xl bg-black/80 backdrop-blur-md border border-amber-500/40 text-xs text-white flex items-center justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className="font-bold text-amber-400 truncate">49-வது பஜார் வீதி, வந்தவாசி</p>
-                        <p className="text-[10px] text-stone-300 truncate">I.O.B வங்கிக்கு எதிரில் • 📞 9884893477</p>
-                      </div>
-                      <Link
-                        to="/contact"
-                        className="bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold px-3 py-1.5 rounded-lg text-[10px] whitespace-nowrap transition-colors shrink-0"
-                      >
-                        {lang === 'ta' ? 'வழி & வரைபடம்' : 'Store Map'}
-                      </Link>
-                    </div>
+                {/* Floating 3D Tilted Shop Poster in Corner */}
+                <div className="absolute bottom-3 right-3 w-28 sm:w-32 rounded-xl overflow-hidden border border-amber-400/60 shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-300">
+                  <img
+                    src="/images/shop_banner_singapore.jpg"
+                    alt="சிங்கப்பூர் பேன்சி & கவரிங்"
+                    className="w-full h-auto object-cover"
+                  />
+                  <div className="bg-black/90 p-1 text-[9px] text-amber-300 text-center font-bold">
+                    வந்தவாசி கடை
                   </div>
                 </div>
               </div>
+
             </div>
 
           </div>
         </div>
       </section>
 
-      {/* 2. Categories Grid */}
+      {/* 2. Category Strip */}
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
           <div>
@@ -198,7 +214,7 @@ const HomePage = () => {
             <Link
               key={cat._id || idx}
               to={`/shop?category=${encodeURIComponent(cat.name)}`}
-              className="group bg-white p-4 rounded-2xl border border-stone-200/80 hover:border-amber-400 hover:shadow-xl transition-all duration-300 text-center flex flex-col items-center"
+              className="group bg-white p-5 rounded-3xl border border-stone-200/80 hover:border-amber-400 hover:shadow-xl transition-all duration-300 text-center flex flex-col items-center"
             >
               <div className="w-14 h-14 rounded-full bg-amber-50 group-hover:bg-amber-100 border border-amber-200/60 flex items-center justify-center text-amber-600 mb-3 text-2xl transition-transform group-hover:scale-110">
                 {idx === 0 ? '✨' : idx === 1 ? '🦚' : idx === 2 ? '⛓️' : idx === 3 ? '👑' : '💎'}
@@ -255,7 +271,7 @@ const HomePage = () => {
         </section>
       )}
 
-      {/* 4. Featured Chains Section */}
+      {/* 4. Featured Premium Chains with Share Feature */}
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
           <div>
@@ -286,33 +302,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* 5. Bridal Rental Service Banner */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-stone-900 via-amber-950 to-stone-900 text-white p-8 sm:p-12 border border-amber-600/40 shadow-2xl">
-          <div className="max-w-2xl space-y-4">
-            <span className="inline-block px-3 py-1 bg-amber-500/20 text-amber-300 border border-amber-400/30 rounded-full text-xs font-bold tracking-wider uppercase">
-              {t.bridalSpotlightBadge}
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-serif font-black text-white leading-tight">
-              {t.bridalSpotlightTitle}
-            </h2>
-            <p className="text-xs sm:text-sm text-stone-300 leading-relaxed font-light">
-              {t.bridalSpotlightDesc}
-            </p>
-            <div className="pt-2">
-              <Link
-                to="/rent"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-bold px-6 py-3 rounded-full shadow-lg transition-all"
-              >
-                <Calendar className="w-4 h-4" />
-                <span>{t.bookRentalBtn}</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Virtual Try-On Modal */}
+      {/* 5. Modals */}
       {selectedTryOnProduct && (
         <VirtualTryOnModal
           product={selectedTryOnProduct}
@@ -322,7 +312,6 @@ const HomePage = () => {
         />
       )}
 
-      {/* 3D / 360 Viewer Modal */}
       {selected3DProduct && (
         <Product3DViewerModal
           product={selected3DProduct}
