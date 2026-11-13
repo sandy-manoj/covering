@@ -8,7 +8,9 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-dist
+# dist is intentionally committed so Render can serve the pre-built SPA directly
+# (Render's free tier has no build step that installs client deps)
+# dist
 dist-ssr
 *.local
 
