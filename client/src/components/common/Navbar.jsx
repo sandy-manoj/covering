@@ -112,16 +112,16 @@ const Navbar = () => {
               </Link>
             </div>
 
-            {/* Zone 2: Navigation Links (Visible on >= 1100px / xl, whitespace-nowrap, gap: 28px) */}
-            <nav className="hidden xl:flex items-center gap-7 font-medium text-stone-700 text-sm whitespace-nowrap shrink-0">
+            {/* Zone 2: Navigation Links (Visible on >= 1200px / xl, compact gap) */}
+            <nav className="hidden xl:flex items-center gap-4 2xl:gap-6 font-medium text-stone-700 text-xs 2xl:text-sm whitespace-nowrap shrink-0">
               <Link to="/" className="hover:text-amber-600 transition-colors py-1">
                 {t.home}
               </Link>
               <Link to="/shop" className="hover:text-amber-600 transition-colors py-1">
                 {t.shop}
               </Link>
-              <Link to="/rent" className="hover:text-amber-600 transition-colors flex items-center gap-1.5 py-1">
-                <span className="bg-amber-100 text-amber-900 text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wide">
+              <Link to="/rent" className="hover:text-amber-600 transition-colors flex items-center gap-1 py-1">
+                <span className="bg-amber-100 text-amber-900 text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wide">
                   {t.rentBadge}
                 </span>
                 <span>{t.bridalRental}</span>
@@ -131,13 +131,13 @@ const Navbar = () => {
               </Link>
             </nav>
 
-            {/* Zone 3: Actions Right (Separate items, gap: 12px, zero overlap) */}
-            <div className="flex items-center gap-3 shrink-0">
+            {/* Zone 3: Actions Right */}
+            <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
               
-              {/* Deepavali Offers Pill Button (Screens >= 1280px) */}
+              {/* Deepavali Offers Pill Button (Screens >= 1320px) */}
               <Link
                 to="/shop?offersOnly=true"
-                className="hidden 2xl:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-red-600 to-amber-600 text-white font-bold text-xs shadow-xs hover:shadow-md transition-all whitespace-nowrap animate-pulse shrink-0"
+                className="hidden 2xl:inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-red-600 to-amber-600 text-white font-bold text-xs shadow-xs hover:shadow-md transition-all whitespace-nowrap animate-pulse shrink-0"
               >
                 <Flame className="w-3.5 h-3.5 text-amber-200" />
                 <span>{t.offers}</span>
@@ -147,7 +147,7 @@ const Navbar = () => {
               <button
                 type="button"
                 onClick={toggleLang}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold transition-all active:scale-95 cursor-pointer shrink-0 shadow-2xs whitespace-nowrap"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold transition-all active:scale-95 cursor-pointer shrink-0 shadow-2xs whitespace-nowrap"
                 title="தமிழ் | English"
               >
                 <Languages className="w-3.5 h-3.5 text-amber-700" />
@@ -159,7 +159,7 @@ const Navbar = () => {
                 <button
                   type="button"
                   onClick={() => setMoreOpen(!moreOpen)}
-                  className="flex items-center gap-1 text-stone-700 hover:text-amber-600 transition-colors whitespace-nowrap text-xs font-bold px-2.5 py-1.5 rounded-lg hover:bg-stone-100 cursor-pointer"
+                  className="flex items-center gap-1 text-stone-700 hover:text-amber-600 transition-colors whitespace-nowrap text-xs font-bold px-2 py-1.5 rounded-lg hover:bg-stone-100 cursor-pointer"
                   aria-expanded={moreOpen}
                 >
                   <span>{lang === 'ta' ? 'மேலும்' : 'More'}</span>
@@ -198,27 +198,27 @@ const Navbar = () => {
               <button
                 type="button"
                 onClick={() => setSearchOverlayOpen(!searchOverlayOpen)}
-                className="p-2 text-stone-700 hover:text-amber-600 rounded-full hover:bg-stone-100 transition-colors shrink-0"
+                className="p-1.5 sm:p-2 text-stone-700 hover:text-amber-600 rounded-full hover:bg-stone-100 transition-colors shrink-0"
                 title="Search Products"
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
 
               {/* Wishlist Heart */}
-              <Link to="/wishlist" className="relative p-2 text-stone-700 hover:text-amber-600 transition-colors shrink-0" title="Wishlist">
-                <Heart className="w-5 h-5" />
+              <Link to="/wishlist" className="relative p-1.5 sm:p-2 text-stone-700 hover:text-amber-600 transition-colors shrink-0" title="Wishlist">
+                <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
                 {wishlistCount > 0 && (
-                  <span className="absolute top-1 right-1 bg-rose-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
+                  <span className="absolute top-0.5 right-0.5 bg-rose-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
                     {wishlistCount}
                   </span>
                 )}
               </Link>
 
               {/* Cart Bag */}
-              <Link to="/cart" className="relative p-2 text-stone-700 hover:text-amber-600 transition-colors shrink-0" title="Cart">
-                <ShoppingBag className="w-5 h-5" />
+              <Link to="/cart" className="relative p-1.5 sm:p-2 text-stone-700 hover:text-amber-600 transition-colors shrink-0" title="Cart">
+                <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
                 {cartCount > 0 && (
-                  <span className="absolute top-1 right-1 bg-amber-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  <span className="absolute top-0.5 right-0.5 bg-amber-600 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                     {cartCount}
                   </span>
                 )}
@@ -229,9 +229,9 @@ const Navbar = () => {
                 href={`https://wa.me/91${whatsappPhone.replace(/[^0-9]/g, '')}?text=வணக்கம்%20சிங்கப்பூர்%20பேன்சி%20%26%20கவரிங்`}
                 target="_blank"
                 rel="noreferrer"
-                className="hidden sm:flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-full shadow-sm transition-all active:scale-95 shrink-0"
+                className="flex items-center gap-1 sm:gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full shadow-sm transition-all active:scale-95 shrink-0"
               >
-                <PhoneCall className="w-3.5 h-3.5" />
+                <PhoneCall className="w-3.5 h-3.5 shrink-0" />
                 <span className="whitespace-nowrap">{t.whatsappChat}</span>
               </a>
             </div>

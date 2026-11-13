@@ -22,9 +22,14 @@ const Hero3DChain = ({ style = 'haram' }) => {
     const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
     camera.position.set(0, 0, 3.8);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+      powerPreference: 'high-performance',
+      precision: 'mediump' // smooth 60fps on mobile without GPU throttling
+    });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // Capped at 1.5 to eliminate lag
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
